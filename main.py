@@ -8,24 +8,45 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from datetime import datetime
+from datetime import timedelta
+
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
-SAMPLE_RANGE_NAME = 'Class Data!A2:E'
+SPREADSHEET_ID = '14rNlHqmBvhNh8Codp8P059KVk8Ih3CypsmiEdGQBsNg'
+RANGE_PREFIX = 'Sheet1!'
+
+# [[RANGE_FROM, RANGE_TO]]
+RANGES = [["C25:I33", "C13:I21"],
+          ["L25:R33", "L13:R21"]
+          ]
+
+
+def update_values(service, spreadsheet_id, range_name, value_input_option,
+                  values):
+    
+    try:
+        body = {
+            'values': values
+        }
+        result = service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id, range=RANGE_PREFIX+range_name,
+            valueInputOption=value_input_option, body=body).execute()
+        # print(f"{result.get('updatedCells')} cells updated.")
+        return result
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+        return error
 
 def main():
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
-    """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -33,30 +54,39 @@ def main():
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
-    try:
+    try: 
         service = build('sheets', 'v4', credentials=creds)
-
-        # Call the Sheets API
         sheet = service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                    range=SAMPLE_RANGE_NAME).execute()
-        values = result.get('values', [])
 
-        if not values:
-            print('No data found.')
-            return
+        for RANGE in RANGES:
+                result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                            range=RANGE_PREFIX+RANGE[0]).execute()
+                values = result.get('values', [])
+                empty = [["" for i in range(7)] for i in range(9)]
+                update_values(service, SPREADSHEET_ID, RANGE[1],"USER_ENTERED", empty)
+                update_values(service, SPREADSHEET_ID, RANGE[1],"USER_ENTERED", values)
+                update_values(service, SPREADSHEET_ID, RANGE[0],"USER_ENTERED", empty)
+        
+        result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                                range=RANGE_PREFIX+"B24").execute()
+        value = result.get('values',[])[0][0]
+        update_values(service, SPREADSHEET_ID, "B12", "USER_ENTERED", [[value]])
+        
+        day = int(value[7:9])
+        month = int(value[10:12])
+        Date_from = datetime(datetime.today().year, month, day) + timedelta(days=1)
+        Date_to = Date_from + timedelta(days=6)
 
-        print('Name, Major:')
-        for row in values:
-            # Print columns A and E, which correspond to indices 0 and 4.
-            print('%s, %s' % (row[0], row[4]))
+        value = "{:02}.{:02}.-{:02}.{:02}.".format(Date_from.day, Date_from.month, Date_to.day, Date_to.month)
+        update_values(service,SPREADSHEET_ID, "B24", "USER_ENTERED", [[value]])
+        print("")
+
     except HttpError as err:
         print(err)
-
+    
 
 if __name__ == '__main__':
     main()
