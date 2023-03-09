@@ -1,4 +1,4 @@
-#Updates washing timetable
+### Updates washing timetable
 
 basic run
 ```bash
