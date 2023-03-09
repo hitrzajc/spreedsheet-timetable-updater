@@ -1,0 +1,10 @@
+[Unit]
+Description=Update timetable
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/opt/wash-timetable-updater/wash-timetable-updater.py
+
+[Install]
+WantedBy=multi-user.target

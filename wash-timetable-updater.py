@@ -14,7 +14,9 @@ from datetime import timedelta
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-# The ID and range of a sample spreadsheet.
+# ID for production 
+# SPREADSHEET_ID = "1f4aUWR46jZeRy_sla25cyCBAnGf0xZ68gOiUmJ3Ekuo"
+# ID for testing
 SPREADSHEET_ID = '14rNlHqmBvhNh8Codp8P059KVk8Ih3CypsmiEdGQBsNg'
 RANGE_PREFIX = 'Sheet1!'
 
@@ -34,7 +36,6 @@ def update_values(service, spreadsheet_id, range_name, value_input_option,
         result = service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id, range=RANGE_PREFIX+range_name,
             valueInputOption=value_input_option, body=body).execute()
-        # print(f"{result.get('updatedCells')} cells updated.")
         return result
     except HttpError as error:
         print(f"An error occurred: {error}")
@@ -61,14 +62,14 @@ def main():
         service = build('sheets', 'v4', credentials=creds)
         sheet = service.spreadsheets()
 
+        empty = [["" for i in range(7)] for i in range(9)]
         for RANGE in RANGES:
                 result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                             range=RANGE_PREFIX+RANGE[0]).execute()
                 values = result.get('values', [])
-                empty = [["" for i in range(7)] for i in range(9)]
-                update_values(service, SPREADSHEET_ID, RANGE[1],"USER_ENTERED", empty)
-                update_values(service, SPREADSHEET_ID, RANGE[1],"USER_ENTERED", values)
-                update_values(service, SPREADSHEET_ID, RANGE[0],"USER_ENTERED", empty)
+                update_values(service, SPREADSHEET_ID, RANGE[1], "USER_ENTERED", empty)
+                update_values(service, SPREADSHEET_ID, RANGE[1], "USER_ENTERED", values)
+                update_values(service, SPREADSHEET_ID, RANGE[0], "USER_ENTERED", empty)
         
         result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                                 range=RANGE_PREFIX+"B24").execute()
@@ -82,7 +83,6 @@ def main():
 
         value = "{:02}.{:02}.-{:02}.{:02}.".format(Date_from.day, Date_from.month, Date_to.day, Date_to.month)
         update_values(service,SPREADSHEET_ID, "B24", "USER_ENTERED", [[value]])
-        print("")
 
     except HttpError as err:
         print(err)

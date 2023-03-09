@@ -1,0 +1,9 @@
+[Unit]
+Description=Run wash-timetable-updater every monday at 3am
+
+[Timer]
+OnCalendar=Mon *-*-* 3:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
