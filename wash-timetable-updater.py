@@ -15,10 +15,10 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 CREDENTALS = service_account.Credentials.from_service_account_file(
      LOCATION+'credentials.json', scopes=SCOPES)
 # ID for production 
-SPREADSHEET_ID = "1f4aUWR46jZeRy_sla25cyCBAnGf0xZ68gOiUmJ3Ekuo"
+# SPREADSHEET_ID = "1f4aUWR46jZeRy_sla25cyCBAnGf0xZ68gOiUmJ3Ekuo"
 # ID for testing
-# SPREADSHEET_ID = '14rNlHqmBvhNh8Codp8P059KVk8Ih3CypsmiEdGQBsNg'
-#RANGE_PREFIX = 'Aktualno!'
+SPREADSHEET_ID = '14rNlHqmBvhNh8Codp8P059KVk8Ih3CypsmiEdGQBsNg'
+RANGE_PREFIX = 'Aktualno!'
 # [[RANGE_FROM, RANGE_TO]]
 RANGES = [["C25:I33", "C13:I21"],
           ["L25:R33", "L13:R21"]
