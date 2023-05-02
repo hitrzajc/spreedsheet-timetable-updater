@@ -58,12 +58,12 @@ def main():
         value = result.get('values',[])[0][0]
         update_values(service, SPREADSHEET_ID, "B12", "USER_ENTERED", [[value]])
         
-        day = int(value[7:9])
-        month = int(value[10:12])
+        day = int(value[8:10])
+        month = int(value[11:13])
         Date_from = datetime(datetime.today().year, month, day) + timedelta(days=1)
         Date_to = Date_from + timedelta(days=6)
 
-        value = "{:02}.{:02}.-{:02}.{:02}.".format(Date_from.day, Date_from.month, Date_to.day, Date_to.month)
+        value = "{:02}.{:02} - {:02}.{:02}".format(Date_from.day, Date_from.month, Date_to.day, Date_to.month)
         update_values(service,SPREADSHEET_ID, "B24", "USER_ENTERED", [[value]])
     except HttpError as err:
         print(err)
