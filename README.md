@@ -9,7 +9,7 @@ python3 main.py
 ```
 
 put the repo in `/opt` and services to `/etc/systemd/system/`
-after that enable the timer. this steps are not necessary.
+after that enable the timer. Change `User` and `Group` acordingly (it must not be root). This steps are not necessary.
 
 program will break when python is updated to another version example from 3.10 to 3.11.
 You can bypass it if you change the link to ordnary file in `venv/bin/python`

@@ -2,6 +2,8 @@
 Description=Update timetable
 
 [Service]
+User=
+Group=
 Type=oneshot
 RemainAfterExit=no
 ExecStart=/opt/wash-timetable-updater/start.sh
